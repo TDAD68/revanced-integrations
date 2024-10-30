@@ -1,7 +1,6 @@
 package app.revanced.integrations.music.returnyoutubedislike;
 
 import static app.revanced.integrations.shared.returnyoutubedislike.ReturnYouTubeDislike.Vote;
-import static app.revanced.integrations.shared.utils.StringRef.str;
 import static app.revanced.integrations.shared.utils.Utils.isSDKAbove;
 
 import android.graphics.Canvas;
@@ -159,21 +158,15 @@ public class ReturnYouTubeDislike {
         // and the like count appears as a device language specific string that says 'Like'.
         // Check if the string contains any numbers.
         if (!Utils.containsNumber(oldLikes)) {
-            if (Settings.RYD_ESTIMATED_LIKE.get()) {
-                // Likes are hidden by video creator
-                //
-                // RYD does not directly provide like data, but can use an estimated likes
-                // using the same scale factor RYD applied to the raw dislikes.
-                //
-                // example video: https://www.youtube.com/watch?v=UnrU5vxCHxw
-                // RYD data: https://returnyoutubedislikeapi.com/votes?videoId=UnrU5vxCHxw
-                Logger.printDebug(() -> "Using estimated likes");
-                oldLikes = formatDislikeCount(voteData.getLikeCount());
-            } else {
-                // Change the "Likes" string to show that likes and dislikes are hidden.
-                String hiddenMessageString = str("revanced_ryd_video_likes_hidden_by_video_owner");
-                return newSpanUsingStylingOfAnotherSpan(oldSpannable, hiddenMessageString);
-            }
+            // Likes are hidden by video creator
+            //
+            // RYD does not directly provide like data, but can use an estimated likes
+            // using the same scale factor RYD applied to the raw dislikes.
+            //
+            // example video: https://www.youtube.com/watch?v=UnrU5vxCHxw
+            // RYD data: https://returnyoutubedislikeapi.com/votes?videoId=UnrU5vxCHxw
+            Logger.printDebug(() -> "Using estimated likes");
+            oldLikes = formatDislikeCount(voteData.getLikeCount());
         }
 
         SpannableStringBuilder builder = new SpannableStringBuilder("\u2009\u2009");

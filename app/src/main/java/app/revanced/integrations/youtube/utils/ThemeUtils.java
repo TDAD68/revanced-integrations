@@ -9,11 +9,27 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 
-import app.revanced.integrations.shared.utils.BaseThemeUtils;
 import app.revanced.integrations.shared.utils.Logger;
+import app.revanced.integrations.shared.utils.ResourceUtils;
 
 @SuppressWarnings({"unused", "SameParameterValue"})
-public class ThemeUtils extends BaseThemeUtils {
+public class ThemeUtils {
+    private static int themeValue;
+
+    /**
+     * Injection point.
+     */
+    public static void setTheme(Enum<?> value) {
+        final int newOrdinalValue = value.ordinal();
+        if (themeValue != newOrdinalValue) {
+            themeValue = newOrdinalValue;
+            Logger.printDebug(() -> "Theme value: " + newOrdinalValue);
+        }
+    }
+
+    public static boolean isDarkTheme() {
+        return themeValue == 1;
+    }
 
     public static int getThemeId() {
         final String themeName = isDarkTheme()
@@ -39,6 +55,14 @@ public class ThemeUtils extends BaseThemeUtils {
         return getDrawable(drawableName);
     }
 
+    public static int getTextColor() {
+        final String colorName = isDarkTheme()
+                ? "yt_white1"
+                : "yt_black1";
+
+        return getColor(colorName);
+    }
+
     /**
      * Since {@link android.widget.Toolbar} is used instead of {@link android.support.v7.widget.Toolbar},
      * We have to manually specify the toolbar background.
@@ -56,7 +80,7 @@ public class ThemeUtils extends BaseThemeUtils {
     public static GradientDrawable getSearchViewShape() {
         GradientDrawable shape = new GradientDrawable();
 
-        String currentHex = getBackgroundColorHexString();
+        String currentHex = getThemeHexValue();
         String defaultHex = isDarkTheme() ? "#1A1A1A" : "#E5E5E5";
 
         String finalHex;
@@ -78,12 +102,24 @@ public class ThemeUtils extends BaseThemeUtils {
         return shape;
     }
 
+    private static String getThemeHexValue() {
+        return String.format("#%06X", (0xFFFFFF & getThemeColor()));
+    }
+
+    private static int getThemeColor() {
+        final String colorName = isDarkTheme()
+                ? "yt_black1"
+                : "yt_white1";
+
+        return ResourceUtils.getColor(colorName);
+    }
+
     private static boolean currentThemeColorIsBlackOrWhite() {
         final int color = isDarkTheme()
-                ? getDarkColor()
-                : getLightColor();
+                ? Color.BLACK
+                : Color.WHITE;
 
-        return getBackgroundColor() == color;
+        return getThemeColor() == color;
     }
 
     // Convert HEX to RGB

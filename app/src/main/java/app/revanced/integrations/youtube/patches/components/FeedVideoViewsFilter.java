@@ -23,6 +23,7 @@ public final class FeedVideoViewsFilter extends Filter {
 
     private final StringFilterGroup feedVideoFilter = new StringFilterGroup(
             null,
+            "video_with_context.eml",
             "video_lockup_with_attachment.eml"
     );
 

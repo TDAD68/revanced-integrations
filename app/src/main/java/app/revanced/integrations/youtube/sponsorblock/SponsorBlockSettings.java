@@ -18,7 +18,6 @@ import app.revanced.integrations.shared.settings.Setting;
 import app.revanced.integrations.shared.utils.Logger;
 import app.revanced.integrations.shared.utils.Utils;
 import app.revanced.integrations.youtube.settings.Settings;
-import app.revanced.integrations.youtube.settings.preference.SponsorBlockSettingsPreference;
 import app.revanced.integrations.youtube.sponsorblock.objects.CategoryBehaviour;
 import app.revanced.integrations.youtube.sponsorblock.objects.SegmentCategory;
 
@@ -241,6 +240,5 @@ public class SponsorBlockSettings {
      */
     public static void updateFromImportedSettings() {
         SegmentCategory.loadAllCategoriesFromSettings();
-        SponsorBlockSettingsPreference.updateSegmentCategories();
     }
 }

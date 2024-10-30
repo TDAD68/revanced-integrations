@@ -461,7 +461,8 @@ public class SegmentPlaybackController {
 
             for (SponsorSegment segment : segments) {
                 final float left = leftPadding + segment.start * videoMillisecondsToPixels;
-                final float right = leftPadding + segment.end * videoMillisecondsToPixels;
+                final float right;
+                right = leftPadding + segment.end * videoMillisecondsToPixels;
                 canvas.drawRect(left, top, right, bottom, segment.category.paint);
             }
         } catch (Exception ex) {

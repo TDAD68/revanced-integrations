@@ -15,16 +15,16 @@ enum class VideoState {
 
     companion object {
 
-        private val nameToVideoState = entries.associateBy { it.name }
+        private val nameToVideoState = values().associateBy { it.name }
 
         @JvmStatic
         fun setFromString(enumName: String) {
             val state = nameToVideoState[enumName]
             if (state == null) {
                 Logger.printException { "Unknown VideoState encountered: $enumName" }
-            } else if (current != state) {
+            } else if (currentVideoState != state) {
                 Logger.printDebug { "VideoState changed to: $state" }
-                current = state
+                currentVideoState = state
             }
         }
 
@@ -33,7 +33,7 @@ enum class VideoState {
          * this value may not be up to date with the actual playback state.
          */
         @JvmStatic
-        var current
+        var current: VideoState?
             get() = currentVideoState
             private set(value) {
                 currentVideoState = value
