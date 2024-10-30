@@ -84,11 +84,6 @@ public final class ShortsButtonFilter extends Filter {
                 "shorts_info_panel_overview"
         );
 
-        StringFilterGroup stickers = new StringFilterGroup(
-                Settings.HIDE_SHORTS_STICKERS,
-                "stickers_layer.eml"
-        );
-
         StringFilterGroup liveHeader = new StringFilterGroup(
                 Settings.HIDE_SHORTS_LIVE_HEADER,
                 "immersive_live_header"
@@ -127,7 +122,7 @@ public final class ShortsButtonFilter extends Filter {
         addPathCallbacks(
                 suggestedAction, actionBar, joinButton, subscribeButton, metaPanelButton,
                 paidPromotionButton, pausedOverlayButtons, channelBar, fullVideoLinkLabel,
-                videoTitle, reelSoundMetadata, infoPanel, liveHeader, stickers
+                videoTitle, reelSoundMetadata, infoPanel, liveHeader
         );
 
         //
@@ -163,10 +158,6 @@ public final class ShortsButtonFilter extends Filter {
                 new ByteArrayFilterGroup(
                         Settings.HIDE_SHORTS_REMIX_BUTTON,
                         "reel_remix_button"
-                ),
-                new ByteArrayFilterGroup(
-                        Settings.DISABLE_SHORTS_LIKE_BUTTON_FOUNTAIN_ANIMATION,
-                        "shorts_like_fountain"
                 )
         );
 
@@ -203,9 +194,8 @@ public final class ShortsButtonFilter extends Filter {
                         "yt_outline_location_point_"
                 ),
                 new ByteArrayFilterGroup(
-                        Settings.HIDE_SHORTS_SAVE_MUSIC_BUTTON,
-                        "yt_outline_list_add_",
-                        "yt_outline_bookmark_"
+                        Settings.HIDE_SHORTS_SAVE_SOUND_BUTTON,
+                        "yt_outline_list_add_"
                 ),
                 new ByteArrayFilterGroup(
                         Settings.HIDE_SHORTS_SEARCH_SUGGESTIONS_BUTTON,
@@ -219,19 +209,8 @@ public final class ShortsButtonFilter extends Filter {
                         Settings.HIDE_SHORTS_USE_TEMPLATE_BUTTON,
                         "yt_outline_template_add"
                 ),
-                new ByteArrayFilterGroup(
-                        Settings.HIDE_SHORTS_GREEN_SCREEN_BUTTON,
-                        "shorts_green_screen"
-                ),
                 useThisSoundButton
         );
-    }
-
-    private boolean isEverySuggestedActionFilterEnabled() {
-        for (ByteArrayFilterGroup group : suggestedActionsGroupList)
-            if (!group.isEnabled()) return false;
-
-        return true;
     }
 
     @Override
@@ -268,9 +247,6 @@ public final class ShortsButtonFilter extends Filter {
         }
 
         if (matchedGroup == suggestedAction) {
-            if (isEverySuggestedActionFilterEnabled()) {
-                return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedGroup, contentType, contentIndex);
-            }
             // Suggested actions can be at the start or in the middle of a path.
             if (suggestedActionsGroupList.check(protobufBufferArray).isFiltered()) {
                 return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedGroup, contentType, contentIndex);

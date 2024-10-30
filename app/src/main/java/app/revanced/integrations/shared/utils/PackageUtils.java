@@ -54,10 +54,6 @@ public class PackageUtils extends Utils {
         }
     }
 
-    public static int getSmallestScreenWidthDp() {
-        return smallestScreenWidthDp;
-    }
-
     // utils
     @Nullable
     private static PackageInfo getPackageInfo() {
