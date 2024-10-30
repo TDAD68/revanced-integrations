@@ -48,9 +48,6 @@ public abstract class AbstractPreferenceFragment extends PreferenceFragment {
 
     private final SharedPreferences.OnSharedPreferenceChangeListener listener = (sharedPreferences, str) -> {
         try {
-            if (str == null) {
-                return;
-            }
             Setting<?> setting = Setting.getSettingFromPath(str);
             if (setting == null) {
                 return;

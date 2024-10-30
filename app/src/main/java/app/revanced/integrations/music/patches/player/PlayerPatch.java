@@ -7,14 +7,14 @@ import static app.revanced.integrations.shared.utils.Utils.isSDKAbove;
 import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.view.View;
+import android.view.ViewGroup;
 
 import java.util.Arrays;
 
 import app.revanced.integrations.music.settings.Settings;
 import app.revanced.integrations.music.shared.VideoType;
-import app.revanced.integrations.music.utils.VideoUtils;
 
-@SuppressWarnings({"unused"})
+@SuppressWarnings({"unused", "ResultOfMethodCallIgnored"})
 public class PlayerPatch {
     private static final int MUSIC_VIDEO_GREY_BACKGROUND_COLOR = -12566464;
     private static final int MUSIC_VIDEO_ORIGINAL_BACKGROUND_COLOR = -16579837;
@@ -128,11 +128,13 @@ public class PlayerPatch {
         return originalColor;
     }
 
-    public static void hideAudioVideoSwitchToggle(View view, int originalVisibility) {
-        if (Settings.HIDE_AUDIO_VIDEO_SWITCH_TOGGLE.get()) {
-            originalVisibility = View.GONE;
+    public static void hideAudioVideoSwitchToggle(View view) {
+        if (!Settings.HIDE_AUDIO_VIDEO_SWITCH_TOGGLE.get())
+            return;
+
+        if (view.getParent() instanceof ViewGroup viewGroup) {
+            viewGroup.setVisibility(View.INVISIBLE);
         }
-        view.setVisibility(originalVisibility);
     }
 
     public static void hideDoubleTapOverlayFilter(View view) {
@@ -143,16 +145,14 @@ public class PlayerPatch {
         return Settings.HIDE_FULLSCREEN_SHARE_BUTTON.get() ? 0 : original;
     }
 
-    public static void setShuffleState(Enum<?> shuffleState) {
+    public static void setShuffleState(int buttonState) {
         if (!Settings.REMEMBER_SHUFFLE_SATE.get())
             return;
-        Settings.ALWAYS_SHUFFLE.save(shuffleState.ordinal() == 1);
+        Settings.SHUFFLE_SATE.save(buttonState);
     }
 
-    public static void shuffleTracks() {
-        if (!Settings.ALWAYS_SHUFFLE.get())
-            return;
-        VideoUtils.shuffleTracks();
+    public static int getShuffleState() {
+        return Settings.SHUFFLE_SATE.get();
     }
 
     public static boolean rememberRepeatState(boolean original) {
@@ -163,15 +163,11 @@ public class PlayerPatch {
         return Settings.REMEMBER_SHUFFLE_SATE.get();
     }
 
-    public static boolean restoreOldCommentsPopUpPanels() {
-        return restoreOldCommentsPopUpPanels(true);
-    }
-
     public static boolean restoreOldCommentsPopUpPanels(boolean original) {
         if (!Settings.SETTINGS_INITIALIZED.get()) {
             return original;
         }
-        return !Settings.RESTORE_OLD_COMMENTS_POPUP_PANELS.get() && original;
+        return !Settings.RESTORE_OLD_COMMENTS_POPUP_PANELS.get();
     }
 
     public static boolean restoreOldPlayerBackground(boolean original) {

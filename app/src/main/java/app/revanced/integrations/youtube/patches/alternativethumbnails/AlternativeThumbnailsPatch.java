@@ -157,8 +157,7 @@ public final class AlternativeThumbnailsPatch {
         // Cannot use unsecured 'http', otherwise the connections fail to start and no callbacks hooks are made.
         String scheme = apiUri.getScheme();
         if (scheme == null || scheme.equals("http") || apiUri.getHost() == null) {
-            Utils.showToastLong(str("revanced_alt_thumbnail_dearrow_api_url_invalid_toast"));
-            Utils.showToastShort(str("revanced_extended_reset_to_default_toast"));
+            Utils.showToastLong("Invalid DeArrow API URL. Using default");
             Settings.ALT_THUMBNAIL_DEARROW_API_URL.resetToDefault();
             return validateSettings();
         }

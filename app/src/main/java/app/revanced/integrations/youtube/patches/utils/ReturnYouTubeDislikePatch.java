@@ -79,7 +79,7 @@ public class ReturnYouTubeDislikePatch {
     @Nullable
     private static volatile String lastPrefetchedVideoId;
 
-    public static void onRYDStatusChange() {
+    public static void onRYDStatusChange(boolean rydEnabled) {
         ReturnYouTubeDislikeApi.resetRateLimits();
         // Must remove all values to protect against using stale data
         // if the user enables RYD while a video is on screen.
