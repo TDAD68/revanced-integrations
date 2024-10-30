@@ -10,6 +10,7 @@ import app.revanced.integrations.music.returnyoutubedislike.ReturnYouTubeDislike
 import app.revanced.integrations.music.settings.Settings;
 import app.revanced.integrations.shared.returnyoutubedislike.requests.ReturnYouTubeDislikeApi;
 import app.revanced.integrations.shared.utils.Logger;
+import app.revanced.integrations.shared.utils.Utils;
 
 /**
  * Handles all interaction of UI patch components.

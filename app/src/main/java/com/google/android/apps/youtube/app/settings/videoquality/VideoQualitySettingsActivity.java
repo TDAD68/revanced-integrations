@@ -11,10 +11,6 @@ import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
 import android.widget.TextView;
 import android.widget.Toolbar;
-
-import java.lang.ref.WeakReference;
-import java.lang.reflect.Field;
-
 import app.revanced.integrations.shared.utils.Logger;
 import app.revanced.integrations.shared.utils.ResourceUtils;
 import app.revanced.integrations.shared.utils.Utils;
@@ -63,11 +59,8 @@ public class VideoQualitySettingsActivity extends Activity {
             // Set content
             setContentView(ResourceUtils.getLayoutIdentifier("revanced_settings_with_toolbar"));
 
-            String dataString = getIntent().getDataString();
-            if (dataString == null) {
-                Logger.printException(() -> "DataString is null");
-                return;
-            } else if (dataString.equals("revanced_extended_settings_intent")) {
+            String dataString = Objects.requireNonNull(getIntent().getDataString());
+            if (dataString.equals("revanced_extended_settings_intent")) {
                 fragment = new ReVancedPreferenceFragment();
             } else {
                 Logger.printException(() -> "Unknown setting: " + dataString);
@@ -132,7 +125,7 @@ public class VideoQualitySettingsActivity extends Activity {
         TextView toolbarTextView = Utils.getChildView(toolbar, view -> view instanceof TextView);
         textViewRef = new WeakReference<>(toolbarTextView);
         if (toolbarTextView != null) {
-            toolbarTextView.setTextColor(ThemeUtils.getForegroundColor());
+            toolbarTextView.setTextColor(ThemeUtils.getTextColor());
         }
         toolBarParent.addView(toolbar, 0);
     }
@@ -148,20 +141,22 @@ public class VideoQualitySettingsActivity extends Activity {
 
         searchView.setQueryHint(finalSearchHint);
 
-        // region set the font size
-
+        // Set the font size
         try {
-            // 'android.widget.SearchView' has been deprecated quite a long time ago
-            // So access the SearchView's EditText via reflection
+            // Access the SearchView's EditText via reflection
             Field field = searchView.getClass().getDeclaredField("mSearchSrcTextView");
             field.setAccessible(true);
 
+            // Get the EditText instance
+            EditText searchEditText = (EditText) field.get(searchView);
+
             // Set the font size
-            if (field.get(searchView) instanceof EditText searchEditText) {
+            if (searchEditText != null) {
                 searchEditText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
             }
-        } catch (NoSuchFieldException | IllegalAccessException ex) {
-            Logger.printException(() -> "Reflection error accessing mSearchSrcTextView", ex);
+
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            Logger.printDebug(() -> "Reflection error accessing mSearchSrcTextView: " + e.getMessage());
         }
 
         // endregion
