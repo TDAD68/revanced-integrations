@@ -14,6 +14,7 @@ import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -30,25 +31,32 @@ import app.revanced.integrations.youtube.settings.Settings;
 
 public class StreamingDataRequest {
     private static final ClientType[] allClientTypes = {
+            ClientType.IOS,
             ClientType.ANDROID_VR,
             ClientType.ANDROID_UNPLUGGED,
-            ClientType.IOS,
+            ClientType.ANDROID_TESTSUITE,
+            ClientType.ANDROID_EMBEDDED_PLAYER,
+            ClientType.WEB,
+            ClientType.TVHTML5_SIMPLY_EMBEDDED_PLAYER
     };
 
     private static final ClientType[] clientTypesToUse;
 
     static {
-        ClientType preferredClient = Settings.SPOOF_STREAMING_DATA_TYPE.get();
-        clientTypesToUse = new ClientType[allClientTypes.length];
+        final int numberOfClients = allClientTypes.length;
+        ClientType[] localClientTypes = new ClientType[numberOfClients];
 
-        clientTypesToUse[0] = preferredClient;
+        ClientType preferredClient = Settings.SPOOF_STREAMING_DATA_TYPE.get();
+        localClientTypes[0] = preferredClient;
 
         int i = 1;
         for (ClientType c : allClientTypes) {
             if (c != preferredClient) {
-                clientTypesToUse[i++] = c;
+                localClientTypes[i++] = c;
             }
         }
+        localClientTypes = Arrays.copyOfRange(localClientTypes, 0, 3);
+        clientTypesToUse = localClientTypes;
     }
 
     private static ClientType lastSpoofedClientType;
@@ -87,7 +95,8 @@ public class StreamingDataRequest {
                 }
             });
 
-    public static void fetchRequest(@NonNull String videoId, Map<String, String> fetchHeaders) {
+    public static void fetchRequest(String videoId, Map<String, String> fetchHeaders) {
+        // Always fetch, even if there is a existing request for the same video.
         cache.put(videoId, new StreamingDataRequest(videoId, fetchHeaders));
     }
 
@@ -99,12 +108,6 @@ public class StreamingDataRequest {
     private static void handleConnectionError(String toastMessage, @Nullable Exception ex) {
         Logger.printInfo(() -> toastMessage, ex);
     }
-
-    private static final String[] REQUEST_HEADER_KEYS = {
-            "Authorization", // Available only to logged in users.
-            "X-GOOG-API-FORMAT-VERSION",
-            "X-Goog-Visitor-Id"
-    };
 
     @Nullable
     private static HttpURLConnection send(ClientType clientType, String videoId,
@@ -122,12 +125,10 @@ public class StreamingDataRequest {
             connection.setConnectTimeout(HTTP_TIMEOUT_MILLISECONDS);
             connection.setReadTimeout(HTTP_TIMEOUT_MILLISECONDS);
 
-            for (String key : REQUEST_HEADER_KEYS) {
-                String value = playerHeaders.get(key);
-                if (value != null) {
-                    connection.setRequestProperty(key, value);
-                }
-            }
+            String authHeader = playerHeaders.get("Authorization");
+            String visitorId = playerHeaders.get("X-Goog-Visitor-Id");
+            connection.setRequestProperty("Authorization", authHeader);
+            connection.setRequestProperty("X-Goog-Visitor-Id", visitorId);
 
             String innerTubeBody = PlayerRoutes.createInnertubeBody(clientType, videoId);
             byte[] requestBody = innerTubeBody.getBytes(StandardCharsets.UTF_8);
@@ -166,7 +167,7 @@ public class StreamingDataRequest {
                     if (connection.getContentLength() != 0) {
                         try (InputStream inputStream = new BufferedInputStream(connection.getInputStream())) {
                             try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-                                byte[] buffer = new byte[8192];
+                                byte[] buffer = new byte[2048];
                                 int bytesRead;
                                 while ((bytesRead = inputStream.read(buffer)) >= 0) {
                                     baos.write(buffer, 0, bytesRead);
